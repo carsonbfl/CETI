@@ -1,6 +1,6 @@
 # CH3X's EDSM Toolkit Interface (CETI)
 
-**Version:** 1.1  
+**Version:** 1.2 
 **Author:** CH3X  
 **Purpose:** Overlay tool for Elite: Dangerous that checks system visitation status via the EDSM API.
 
