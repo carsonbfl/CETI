@@ -182,7 +182,7 @@ class Overlay(QtWidgets.QWidget):
 
         button_layout.addWidget(self.settings_button)
         button_layout.addWidget(self.save_button)
-        button_layout.addWidget(self.find_button)   # Find Nearby now before EDSM
+        button_layout.addWidget(self.find_button)   
         button_layout.addWidget(self.edsm_button)
         layout.addLayout(button_layout)
 
@@ -368,7 +368,7 @@ class Overlay(QtWidgets.QWidget):
         self.system_label.setText(base_text + timing_text)
         self.edsm_button.setEnabled(visited)
         self.save_button.setEnabled(True)
-        self.find_button.setEnabled(True)  # Always enable Find Nearby
+        self.find_button.setEnabled(True)  
         self.edsm_button.setStyleSheet("color: white; background-color: #0a0;" if visited else "color: white; background-color: #a00;")
 
     def open_edsm(self):
