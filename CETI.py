@@ -48,12 +48,14 @@ QPushButton#cornerButton:hover {
 }
 """
 
-# API URLs and Patterns
+# API URLs, Regex, constants
 EDSM_API_URL = "https://www.edsm.net/api-v1/systems?systemName={}&showId=1"
 EDSM_SYSTEM_URL = "https://www.edsm.net/en/system/id/{}/name/{}"
 SPHERE_SYSTEMS_API_URL = "https://www.edsm.net/api-v1/sphere-systems?x={}&y={}&z={}&radius={}&showId=1&showCoordinates=1"
 SYSTEM_NAME_PATTERN = re.compile(r"^[\w\s\-\'*\.:()]{1,64}$")
 last_queried_system = None
+version = "1.2"
+
 
 class ClipboardMonitor(QtCore.QThread):
     new_clipboard_text = QtCore.pyqtSignal(str)
@@ -83,7 +85,7 @@ class Overlay(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.CustomizeWindowHint)
-        self.setWindowTitle("CETI v.1.1")
+        self.setWindowTitle(f"CETI {version}")
         self.resize(350, 160)
         self.setMinimumSize(100, 100)
 
@@ -102,7 +104,7 @@ class Overlay(QtWidgets.QWidget):
         self.bg_color = "#371e09"
         self.border_color = "#ff7a00"
         self.text_color = "white"
-        self.csv_file = "CETIv1.1_saved_systems.csv"
+        self.csv_file = f"CETI{version}_saved_systems.csv"
         expected_header = [
             "System Name", "Status", "Time Saved", "EDSM Link", "XYZ",
             "BackgroundColor", "BorderColor", "TextColor", "Keybind"
@@ -137,7 +139,7 @@ class Overlay(QtWidgets.QWidget):
         # Layouts and Widgets
         layout = QtWidgets.QVBoxLayout(self)
         header_layout = QtWidgets.QHBoxLayout()
-        title_label = QtWidgets.QLabel("CETI v1.1")
+        title_label = QtWidgets.QLabel(f"CETI {version}")
         title_label.setStyleSheet("font-weight: bold; font-size: 12pt;")
         title_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
 
@@ -374,8 +376,6 @@ class Overlay(QtWidgets.QWidget):
             url = EDSM_SYSTEM_URL.format(self.system_id, self.last_displayed_system)
             webbrowser.open_new_tab(url)
 
-    def open_readme(self):
-        webbrowser.open_new_tab("https://github.com")
 
     def get_coords_and_radius(self):
         dialog = QtWidgets.QDialog(self)
@@ -515,7 +515,7 @@ class SettingsDialog(QtWidgets.QDialog):
         title.setStyleSheet("font-weight: bold; font-size: 12pt;")
         gh_button = QtWidgets.QPushButton("GH")
         gh_button.setFixedSize(32, 24)
-        gh_button.clicked.connect(lambda: webbrowser.open_new_tab("https://github.com"))
+        gh_button.clicked.connect(lambda: webbrowser.open_new_tab("https://github.com/carsonbfl/CETI"))
         reset_button = QtWidgets.QPushButton("R")
         reset_button.setFixedSize(24, 24)
         reset_button.setToolTip("Reset to default settings")
