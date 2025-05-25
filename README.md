@@ -42,7 +42,7 @@
 
 ## 🗃 Output CSV Format
 
-Saved to: `CETIv1.1_saved_systems.csv`
+Saved to: `CETIv1.2_saved_systems.csv`
 
 | Column           | Description                                 |
 |------------------|---------------------------------------------|
