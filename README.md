@@ -84,7 +84,7 @@ pip install pyqt5 pyperclip requests keyboard
 ```
 
 **Important:**  
-The `.exe` or Python script **must be located in the same folder as the `CETIv1.1_saved_systems.csv` file**.  
+The `.exe` or Python script **must be located in the same folder as the `CETIv1.2_saved_systems.csv` file**.  
 For best results, keep all files together in a dedicated folder.
 
 ---
