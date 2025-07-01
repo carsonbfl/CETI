@@ -1,5 +1,31 @@
-*.csv
-*.cmd
-/dist
-/build
-*.spec
+
+# --- Build outputs ---
+__pycache__/
+*.py[cod]
+*.pyo
+build
+dist
+
+# --- User-specific/working files ---
+*.csv      
+*.log
+*.db
+*.tmp
+
+# --- Virtual environments ---
+.venv/
+*.env
+.env/
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- IDE/editor files ---
+.vscode/
+.idea/
+
+# --- PyInstaller runtime helper (if used) ---
+*.manifest
+*.dll
+*.exe

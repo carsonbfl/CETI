@@ -1,101 +1,77 @@
-# CH3X's EDSM Toolkit Interface (CETI)
+# Ch3x's Exploration Toolkit Interface (CETI)
 
-**Version:** 1.2 
-**Author:** CH3X  
-**Purpose:** Overlay tool for Elite: Dangerous that checks system visitation status via the EDSM API.
+**Version:** 1.3
+**Author:** CH3X
+**Purpose:** Minimalist overlay utility for Elite: Dangerous, focused on exploration tools including system status checking, map-linked display, and data recording.
 
 ---
 
 ## 🚀 Features
 
-- 📋 Monitors clipboard for system names copied from the Galaxy Map.
-- 🔍 Queries the [EDSM](https://www.edsm.net/) API for visitation status.
-- ✅ Displays status (Visited / Not Visited) in a minimalist overlay.
-- 💾 Saves system data (visited or not) to a local CSV, including manual XYZ entry for unvisited systems.
-- 🌐 Opens EDSM links in the browser for visited systems.
-- 🗗 Reset window size.
-- ⚙️ Settings menu for:
-  - Window transparency
-  - Custom hotkey binding
-  - Color scheme (background, border, text)
-  - Quick access to GitHub
-  - Reset to default settings
-- 🔎 "Find Nearby" tool to search for visited systems near a set of coordinates.
-- Always-on-top overlay with draggable, resizable interface.
+* 📅 **Monitors the Elite Dangerous Player Journal** in real time
+  * Tracks when the Galaxy Map is opened or closed for display visibility
+  * Detects when a system is targeted via the Galaxy Map
+
+* 🔍 Queries the [EDSM](https://www.edsm.net/) API for visitation status
+* ✅ Displays system status (Visited / Not Visited) in a compact overlay
+* 📂 (Optional) Saves system data to a local CSV with optional XYZ coordinates
+* 🔐 System tray integration
+
+  * Always-running tray icon with restore and exit options
+  * Overlay can be hidden but remains active
+* 📁 "Find Nearby" tool for locating visited systems near coordinates
+* 🔹 Quick access to EDSM page for visited systems
+* ⚙️ Settings menu for:
+
+  * Overlay transparency
+  * Color theme (background, border, text)
+  * Reset to defaults
+  * GitHub link
+  * Visivibility Toggle
+* □ Resizable and draggable overlay
 
 ---
 
-## 🖱 Usage
+## 💪 How It Works
 
 1. Launch CETI.
-2. Configure the keybind to match your Galaxy Map key in-game.
-3. The overlay will:
-   - Detect system names when copied to clipboard
-   - Query EDSM
-   - Show the status (Visited/Not Visited)
-   - Toggle visibility on keybind
-4. Use the 💾 button to save system data (works for both visited and unvisited systems).
-   - For unvisited systems, you will be prompted to enter XYZ coordinates.
-5. Use the "Find Nearby" button to search for visited systems near a set of coordinates (Target focus and use the Galaxy Map grid).
+2. The overlay starts hidden if Galaxy Map detection is enabled and Galaxy Map is open.
+3. CETI monitors your Player Journal for:
+
+   * **MusicTrack: GalaxyMap** to determine when to show/hide overlay. For some reason that is the most reliable method to detect if the player has the map open. :3
+4. When a system is targeted:
+
+   * CETI queries the EDSM API
+   * Displays status and enables options
+5. Use the 📂 button to save system data (manual XYZ for unvisited)
+6. Use "Find Nearby" to search visited systems around user-defined coordinates. (Mostly useful for unvisited systems, does not pull targeted system but instead prompts the user for coordinates, the name is irrelevant for this. More in future WIP)
 
 ---
 
-## 🗃 Output CSV Format
+## 📃 Output CSV Format
 
-Saved to: `CETIv1.1_saved_systems.csv`
+Saved to: `CETIv1.3_saved_systems.csv`
 
-| Column           | Description                                 |
-|------------------|---------------------------------------------|
-| System Name      | Name of the star system                     |
-| Status           | Visited / Not Visited                       |
-| Time Saved       | Local time the data was saved               |
-| EDSM Link        | Direct link to the EDSM system page or "N/A"|
-| XYZ              | Comma-separated X, Y, Z coordinates         |
-| BackgroundColor  | Overlay background color (config row only)  |
-| BorderColor      | Overlay border color (config row only)      |
-| TextColor        | Overlay text color (config row only)        |
-| Keybind          | Overlay toggle keybind (config row only)    |
+| Column          | Description                                |
+| --------------- | ------------------------------------------ |
+| System Name     | Name of the star system                    |
+| Status          | Visited / Not Visited                      |
+| Time Saved      | Local time the data was saved              |
+| EDSM Link       | Direct link to EDSM system page or "N/A"   |
+| XYZ             | Manually entered coordinates               |
+| BackgroundColor | Overlay background color (config row only) |
+| BorderColor     | Overlay border color (config row only)     |
+| TextColor       | Overlay text color (config row only)       |
+| MapVisibility   | True / False for map-triggered visibility  |
 
-- **Note:** The second row in the CSV always holds the current configuration for colors and keybind. System data rows only fill the first five columns.
-
----
-
-## 🧩 Hotkeys
-
-| Function        | Default Key |
-|-----------------|-------------|
-| Toggle Overlay  |     `/`     |
-
-You can customize this in the ⚙️ Settings menu.
+* **Note:** Second row stores the current overlay configuration.
 
 ---
 
-## 🛠 Requirements
+## 🚪 System Tray Behavior
 
-- **If you are using the packaged `.exe` version, no dependencies or Python installation are required.**
-- If you are running from source, you need:
-  - Python 3.8+
-  - `PyQt5`, `pyperclip`, `requests`, `keyboard`
+* CETI runs as a tray application.
+* Right-click the tray icon to:
 
-Install dependencies with:
-
-```bash
-pip install pyqt5 pyperclip requests keyboard
-```
-
-**Important:**  
-The `.exe` or Python script **must be located in the same folder as the `CETIv1.1_saved_systems.csv` file**.  
-For best results, keep all files together in a dedicated folder.
-
----
-
-## 📝 Additional Notes
-
-- The overlay can be moved by dragging and resized with the 🗗 button.
-- The settings menu allows you to change the overlay's color scheme and reset to defaults.
-- The "GH" button in settings opens the GitHub repository.
-- The "R" button in settings resets all overlay colors and keybind to defaults.
-- Saving an unvisited system will prompt you for XYZ coordinates, which are stored in the CSV.
-- The overlay always stays on top for easy reference while playing.
-
----
+  * Show/restore the overlay
+  * Exit the
