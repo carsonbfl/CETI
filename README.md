@@ -74,4 +74,4 @@ Saved to: `CETIv1.3_saved_systems.csv`
 * Right-click the tray icon to:
 
   * Show/restore the overlay
-  * Exit the
+  * Exit the applicaton
