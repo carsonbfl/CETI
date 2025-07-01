@@ -8,9 +8,9 @@
 
 ## 🚀 Features
 
-* 📅 **Monitors the Elite Dangerous Player Journal** in real time
+* 📅 **Monitors the Elite Dangerous Player Journal** 
   * Tracks when the Galaxy Map is opened or closed for display visibility
-  * Detects when a system is targeted via the Galaxy Map
+  * Detects when a system is targeted. (Next in route or just target)
 
 * 🔍 Queries the [EDSM](https://www.edsm.net/) API for visitation status
 * ✅ Displays system status (Visited / Not Visited) in a compact overlay
@@ -19,7 +19,7 @@
 
   * Always-running tray icon with restore and exit options
   * Overlay can be hidden but remains active
-* 📁 "Find Nearby" tool for locating visited systems near coordinates
+* 📁 "Find Nearby" tool for locating visited systems near coordinates (searches ONLY off of coords, reference name is disregarded)
 * 🔹 Quick access to EDSM page for visited systems
 * ⚙️ Settings menu for:
 
@@ -28,7 +28,7 @@
   * Reset to defaults
   * GitHub link
   * Visivibility Toggle
-* □ Resizable and draggable overlay
+  * Window Size
 
 ---
 
@@ -38,7 +38,7 @@
 2. The overlay starts hidden if Galaxy Map detection is enabled and Galaxy Map is open.
 3. CETI monitors your Player Journal for:
 
-   * **MusicTrack: GalaxyMap** to determine when to show/hide overlay. For some reason that is the most reliable method to detect if the player has the map open. :3
+   * **GalaxyMap** to determine when to show/hide overlay.
 4. When a system is targeted:
 
    * CETI queries the EDSM API
