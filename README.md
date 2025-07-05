@@ -8,13 +8,9 @@
 
 ## 🚀 Features
 
-* 📅 **Monitors the Elite Dangerous Player Journal** 
+* 📅 **Monitors the Elite Dangerous Player Journal** in real time
   * Tracks when the Galaxy Map is opened or closed for display visibility
-<<<<<<< HEAD
   * Detects when a system is targeted or next in route
-=======
-  * Detects when a system is targeted. (Next in route or just target)
->>>>>>> 7ccff9a96b0a67258591041a9b4d177821795082
 
 * 🔍 Queries [EDSM](https://www.edsm.net/), [EDASTRO](https://edastro.com/), and [SPANSH](https://spansh.co.uk)
 * ✅ Displays system status (Visited / Not Visited) in a compact overlay
@@ -23,13 +19,8 @@
 
   * Always-running tray icon with restore and exit options
   * Overlay can be hidden but remains active
-<<<<<<< HEAD
 * 📁 "Find Nearby" tool for locating visited systems near coordinates
 * 🔹 Quick access to EDSM, EDASTRO, and SPANSH webpages for visited systems
-=======
-* 📁 "Find Nearby" tool for locating visited systems near coordinates (searches ONLY off of coords, reference name is disregarded)
-* 🔹 Quick access to EDSM page for visited systems
->>>>>>> 7ccff9a96b0a67258591041a9b4d177821795082
 * ⚙️ Settings menu for:
 
   * Overlay transparency
@@ -37,11 +28,7 @@
   * Reset to defaults
   * GitHub link
   * Visivibility Toggle
-<<<<<<< HEAD
 * □ Resizable overlay
-=======
-  * Window Size
->>>>>>> 7ccff9a96b0a67258591041a9b4d177821795082
 
 ---
 
