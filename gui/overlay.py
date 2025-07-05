@@ -540,7 +540,7 @@ class Overlay(QtWidgets.QWidget):
 
                 open_button = QtWidgets.QPushButton("Open in EDSM")
                 open_button.setStyleSheet("color: white; background-color: #0a0; border: 2px solid #ff7a00;")
-                open_button.clicked.connect(lambda: webbrowser.open_new_tab(EDSM_SYSTEM_URL.format(system_id, system_name)))
+                open_button.clicked.connect(lambda: webbrowser.open_new_tab(EDSM_SYSTEM_URL.format(system_name.replace(" ", "%20"))))
                 layout.addWidget(open_button)
 
                 dialog.exec_()
