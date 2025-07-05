@@ -10,5 +10,5 @@ def check_system_on_edsm(system_name):
         else:
             return False, None, response.status_code
     except Exception as e:
-        print(f"Error querying EDSM: {e}")
+        print(f"[EDSM] Error: {e}")
         return None, None, None

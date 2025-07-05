@@ -1,8 +1,8 @@
 # Ch3x's Exploration Toolkit Interface (CETI)
 
-**Version:** 1.3
+**Version:** 1.4
 **Author:** CH3X
-**Purpose:** Minimalist overlay utility for Elite: Dangerous, focused on exploration tools including system status checking, map-linked display, and data recording.
+**Purpose:** Minimalist overlay toolkit for Elite: Dangerous, focused on exploration tools including system visitation status checking, map-linked display, and data recording using EDSM, EDASTRO, and SPANSH.
 
 ---
 
@@ -10,17 +10,17 @@
 
 * 📅 **Monitors the Elite Dangerous Player Journal** in real time
   * Tracks when the Galaxy Map is opened or closed for display visibility
-  * Detects when a system is targeted via the Galaxy Map
+  * Detects when a system is targeted or next in route
 
-* 🔍 Queries the [EDSM](https://www.edsm.net/) API for visitation status
+* 🔍 Queries [EDSM](https://www.edsm.net/), [EDASTRO](https://edastro.com/), and [SPANSH](https://spansh.co.uk)
 * ✅ Displays system status (Visited / Not Visited) in a compact overlay
-* 📂 (Optional) Saves system data to a local CSV with optional XYZ coordinates
+* 📂 (Optional) Saves system data to a local CSV with XYZ coordinates (user input if unvisited)
 * 🔐 System tray integration
 
   * Always-running tray icon with restore and exit options
   * Overlay can be hidden but remains active
 * 📁 "Find Nearby" tool for locating visited systems near coordinates
-* 🔹 Quick access to EDSM page for visited systems
+* 🔹 Quick access to EDSM, EDASTRO, and SPANSH webpages for visited systems
 * ⚙️ Settings menu for:
 
   * Overlay transparency
@@ -28,20 +28,20 @@
   * Reset to defaults
   * GitHub link
   * Visivibility Toggle
-* □ Resizable and draggable overlay
+* □ Resizable overlay
 
 ---
 
 ## 💪 How It Works
 
 1. Launch CETI.
-2. The overlay starts hidden if Galaxy Map detection is enabled and Galaxy Map is open.
+2. The overlay starts hidden. Appears on Galaxy Map open.
 3. CETI monitors your Player Journal for:
 
-   * **MusicTrack: GalaxyMap** to determine when to show/hide overlay. For some reason that is the most reliable method to detect if the player has the map open. :3
+   * **GalaxyMap** to determine when to show/hide overlay.
 4. When a system is targeted:
 
-   * CETI queries the EDSM API
+   * CETI queries EDSM, EDASTRO, and SPANSH
    * Displays status and enables options
 5. Use the 📂 button to save system data (manual XYZ for unvisited)
 6. Use "Find Nearby" to search visited systems around user-defined coordinates. (Mostly useful for unvisited systems, does not pull targeted system but instead prompts the user for coordinates, the name is irrelevant for this. More in future WIP)
@@ -50,7 +50,7 @@
 
 ## 📃 Output CSV Format
 
-Saved to: `CETIv1.3_saved_systems.csv`
+Saved to: `CETIv1.4_saved_systems.csv`
 
 | Column          | Description                                |
 | --------------- | ------------------------------------------ |

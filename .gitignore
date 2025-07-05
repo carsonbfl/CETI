@@ -1,4 +1,3 @@
-
 # --- Build outputs ---
 __pycache__/
 *.py[cod]
@@ -11,6 +10,7 @@ dist
 *.log
 *.db
 *.tmp
+notes.md
 
 # --- Virtual environments ---
 .venv/

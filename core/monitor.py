@@ -2,7 +2,7 @@ from PyQt5 import QtCore
 import os, glob, json
 
 class JournalMonitor(QtCore.QThread):
-    new_targeted_system = QtCore.pyqtSignal(str)
+    new_targeted_system = QtCore.pyqtSignal(str, str)  # system name, system address (as str)
     galmap_opened = QtCore.pyqtSignal()
     galmap_closed = QtCore.pyqtSignal()
 
@@ -27,7 +27,6 @@ class JournalMonitor(QtCore.QThread):
             try:
                 latest = self.find_latest_journal()
 
-                # Switch to the latest journal if it changed or was never set
                 if latest != self.journal_file:
                     self.journal_file = latest
                     self.last_position = 0
@@ -58,7 +57,10 @@ class JournalMonitor(QtCore.QThread):
                         event = entry.get("event")
 
                         if event == "FSDTarget" and "Name" in entry:
-                            self.new_targeted_system.emit(entry["Name"])
+                            name = entry["Name"]
+                            raw_address = entry.get("SystemAddress", 0)
+                            system_address = str(raw_address)  # force it to a string
+                            self.new_targeted_system.emit(name, system_address)
 
                         elif event == "Music":
                             track = entry.get("MusicTrack", "")

@@ -90,7 +90,7 @@ class Overlay(QtWidgets.QWidget):
                             self.text_color = config_row[7] or self.text_color
                             self.toggle_key = config_row[8] or self.toggle_key
                             config_loaded = True
-        if not config_loaded:
+        if not file_exists:
             with open(self.csv_file, "w", encoding="utf-8", newline="") as f:
                 writer = csv.writer(f)
                 writer.writerow(expected_header)
@@ -101,6 +101,7 @@ class Overlay(QtWidgets.QWidget):
                     str(self.visibility_tied_to_map),
                     str(self.width()), str(self.height())
                 ])
+
 
 
         self.csv_file_handle = open(self.csv_file, mode="a", newline="", encoding="utf-8")
@@ -135,22 +136,30 @@ class Overlay(QtWidgets.QWidget):
         layout.addWidget(self.system_label)
 
         button_layout = QtWidgets.QHBoxLayout()
+        button_size = QtCore.QSize(80, 28)
+
         self.settings_button = QtWidgets.QPushButton("⚙️")
+        self.settings_button.setFixedSize(button_size)
         self.settings_button.clicked.connect(self.open_settings)
 
         self.save_button = QtWidgets.QPushButton("💾")
+        self.save_button.setFixedSize(button_size)
         self.save_button.setEnabled(False)
         self.save_button.clicked.connect(self.save_to_csv)
 
-        self.find_button = QtWidgets.QPushButton("Find Nearby")
+        self.find_button = QtWidgets.QPushButton("Nearby")
+        self.find_button.setFixedSize(button_size)
         self.find_button.setObjectName("findNearbyButton")
         self.find_button.setEnabled(False)
         self.find_button.clicked.connect(self.find_nearby_system)
 
-        self.edsm_button = QtWidgets.QPushButton("EDSM")
-        self.edsm_button.setObjectName("edsmButton")
+        self.edsm_button = QtWidgets.QPushButton("Browser")
+        self.edsm_button.setFixedSize(button_size)
+        self.edsm_button.setObjectName("webButton")
         self.edsm_button.setEnabled(False)
-        self.edsm_button.clicked.connect(self.open_edsm)
+        self.edsm_button.setStyleSheet("color: white; background-color: #a00;")
+        self.edsm_button.clicked.connect(self.show_web_menu)
+
 
         button_layout.addWidget(self.settings_button)
         button_layout.addWidget(self.save_button)
@@ -236,28 +245,40 @@ class Overlay(QtWidgets.QWidget):
         system_name = self.last_displayed_system
         status = self.last_displayed_status
         time_saved = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        edsm_link = "N/A"
         xyz_str = ""
-        if self.visited and self.system_id:
-            edsm_link = EDSM_SYSTEM_URL.format(self.system_id, system_name)
+
+        if self.visited:
+            try:
+                response = requests.get(f"https://www.edsm.net/api-v1/system?systemName={system_name}&showCoordinates=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    if "coords" in data:
+                        coords = data["coords"]
+                        x, y, z = coords.get("x"), coords.get("y"), coords.get("z")
+                        xyz_str = f"{x}, {y}, {z}"
+                        edsm_link = f"https://www.edsm.net/en/system?systemName={system_name.replace(' ', '%20')}"
+            except Exception as e:
+                print(f"[Save] Failed to fetch coords: {e}")
         else:
             coords = self.get_xyz_coords_dialog()
             if coords is None:
                 return
             x, y, z = coords
-            edsm_link = "N/A"
             xyz_str = f"{x}, {y}, {z}"
 
         self.csv_writer.writerow([system_name, status, time_saved, edsm_link, xyz_str, "", "", "", ""])
         self.csv_file_handle.flush()
         print(f"System details saved to {self.csv_file}")
-        current_text = self.system_label.text()
-        if "*saved" not in current_text:
-            self.system_label.setText(current_text + "\n*saved")
+        self.save_button.setStyleSheet("color: white; background-color: #0a0; border: 2px solid #ff7a00;")
+
+
+
+
 
     def get_xyz_coords_dialog(self):
         dialog = QtWidgets.QDialog(self)
-        self.setWindowFlags(QtCore.Qt.Tool | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
-
+        dialog.setWindowFlags(QtCore.Qt.Tool | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
 
         layout = QtWidgets.QVBoxLayout(dialog)
 
@@ -267,7 +288,7 @@ class Overlay(QtWidgets.QWidget):
         title.setStyleSheet("font-weight: bold; font-size: 12pt;")
         close_button = QtWidgets.QPushButton("X")
         close_button.setFixedSize(24, 24)
-        close_button.clicked.connect(self.close)
+        close_button.clicked.connect(dialog.reject)
         title_layout.addWidget(title)
         title_layout.addStretch()
         title_layout.addWidget(close_button)
@@ -277,7 +298,7 @@ class Overlay(QtWidgets.QWidget):
         input_field.setPlaceholderText("X, Y, Z (e.g., 123.45, -67.8, 9000)")
         layout.addWidget(input_field)
 
-        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok)
+        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
         button_box.accepted.connect(dialog.accept)
         button_box.rejected.connect(dialog.reject)
         layout.addWidget(button_box)
@@ -293,31 +314,38 @@ class Overlay(QtWidgets.QWidget):
                 return None
         return None
 
+
     def save_config_to_csv(self):
-        # Update config row in CSV
         with open(self.csv_file, "r", encoding="utf-8", newline="") as f:
             rows = list(csv.reader(f))
+
+        # Ensure at least two rows exist
         if len(rows) < 2:
+            # Add missing header and config line
             rows = [
                 ["System Name", "Status", "Time Saved", "EDSM Link", "XYZ",
-                 "BackgroundColor", "BorderColor", "TextColor"],
-                ["", "", "", "", "", self.bg_color, self.border_color, self.text_color, self.toggle_key, str(self.visibility_tied_to_map)]
+                "BackgroundColor", "BorderColor", "TextColor", "Keybind", "MapVisibility", "Width", "Height"],
+                ["", "", "", "", "", self.bg_color, self.border_color, self.text_color, "", str(self.visibility_tied_to_map), str(self.width()), str(self.height())]
             ]
         else:
+            # Update config row (index 1)
+            if len(rows[1]) < 12:
+                rows[1] += [""] * (12 - len(rows[1]))
             rows[1][5:12] = [
-            self.bg_color,
-            self.border_color,
-            self.text_color,
-            "",  # placeholder for removed toggle key
-            str(self.visibility_tied_to_map),
-            str(self.width()),
-            str(self.height())
-        ]
+                self.bg_color,
+                self.border_color,
+                self.text_color,
+                "",  # keybind placeholder
+                str(self.visibility_tied_to_map),
+                str(self.width()),
+                str(self.height())
+            ]
 
-
+        # Write only header + config + previous saved systems
         with open(self.csv_file, "w", encoding="utf-8", newline="") as f:
             writer = csv.writer(f)
             writer.writerows(rows)
+
 
     def update_colors(self, bg_color, border_color, text_color):
         self.bg_color = bg_color
@@ -335,23 +363,69 @@ class Overlay(QtWidgets.QWidget):
         else:
             self.hide()
 
-    def update_display(self, system_name, visited, system_id):
+    def update_display(self, system_name, visited, system_id, timing_info=None, urls=None):
         display_name = system_name if len(system_name) <= 64 else "N/A"
         self.visited = visited
         self.system_id = system_id
         self.last_displayed_system = display_name
         self.last_displayed_status = "Visited" if visited else "Not visited"
+        self.current_urls = urls or {}
+
         base_text = f"<div>System: {display_name}<br>Status: {self.last_displayed_status}</div>"
-        timing_text = f"<div style='text-align: center; font-size: 8pt; color: #aaa;'>{self.current_timing}</div>" if self.current_timing else ""
+        timing_text = f"<div style='text-align: center; font-size: 8pt; color: #aaa;'>{timing_info}</div>" if timing_info else ""
         self.system_label.setText(base_text + timing_text)
-        self.edsm_button.setEnabled(visited)
+
+        # Enable buttons
+        web_enabled = visited and any(self.current_urls.values())
+
+        self.edsm_button.setEnabled(web_enabled)
+        self.find_button.setEnabled(True)
         self.save_button.setEnabled(True)
-        self.find_button.setEnabled(True)  
-        self.edsm_button.setStyleSheet("color: white; background-color: #0a0;" if visited else "color: white; background-color: #a00;")
+
+        # Reset save button style (remove green if previously set)
+        self.save_button.setStyleSheet("background-color: none;")
+
+        # Style the web button appropriately
+        self.edsm_button.setStyleSheet(
+            "color: white; background-color: #0a0;" if web_enabled else "color: white; background-color: #a00;"
+        )
+
+
+
+
+
+    def show_web_menu(self):
+        if not self.current_urls:
+            return
+
+        menu = QtWidgets.QMenu(self)
+
+        if "edsm" in self.current_urls and self.current_urls["edsm"]:
+            edsm_action = menu.addAction("Open in EDSM")
+            edsm_action.triggered.connect(lambda: webbrowser.open_new_tab(self.current_urls["edsm"]))
+
+        if "edastro" in self.current_urls and self.current_urls["edastro"]:
+            edastro_action = menu.addAction("Open in Edastro")
+            edastro_action.triggered.connect(lambda: webbrowser.open_new_tab(self.current_urls["edastro"]))
+
+        if "spansh" in self.current_urls and self.current_urls["spansh"]:
+            spansh_action = menu.addAction("Open in Spansh")
+            spansh_action.triggered.connect(lambda: webbrowser.open_new_tab(self.current_urls["spansh"]))
+
+        if menu.isEmpty():
+            return
+
+        menu.exec_(self.edsm_button.mapToGlobal(self.edsm_button.rect().bottomLeft()))
+
 
     def open_edsm(self):
-        if self.visited and self.system_id:
-            url = EDSM_SYSTEM_URL.format(self.system_id, self.last_displayed_system)
+        if self.last_displayed_system:
+            url = EDSM_SYSTEM_URL.format(self.last_displayed_system)
+            webbrowser.open_new_tab(url)
+
+    def open_edastro(self):
+        if self.last_displayed_system:
+            url = EDASTRO_API_URL.format(self.last_displayed_system)
             webbrowser.open_new_tab(url)
 
 
@@ -644,4 +718,3 @@ class SettingsDialog(QtWidgets.QDialog):
             self.move(event.globalPos() - self._drag_pos)
             event.accept()
 
-    
