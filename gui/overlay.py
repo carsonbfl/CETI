@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from datetime import datetime
 import webbrowser, csv, requests, os
-from core.constants import EDSM_SYSTEM_URL, SPHERE_SYSTEMS_API_URL, VERSION
+from core.constants import EDSM_SYSTEM_URL, SPHERE_SYSTEMS_API_URL, EDASTRO_API_URL,VERSION, GITHUB_LINK
 
 class Overlay(QtWidgets.QWidget):
     def __init__(self):
@@ -51,45 +51,29 @@ class Overlay(QtWidgets.QWidget):
         file_exists = os.path.isfile(self.csv_file)
         expected_header = [
             "System Name", "Status", "Time Saved", "EDSM Link", "XYZ",
-            "BackgroundColor", "BorderColor", "TextColor", "Keybind", "MapVisibility",
+            "BackgroundColor", "BorderColor", "TextColor", "MapVisibility",
             "Width", "Height"
         ]
+
         config_loaded = False
 
-
-        # And update loading logic:
         if file_exists and os.stat(self.csv_file).st_size > 0:
             with open(self.csv_file, "r", encoding="utf-8", newline="") as f:
                 reader = csv.reader(f)
                 rows = list(reader)
-                if rows and rows[0][:10] == expected_header[:10]:  # ignore last column for now
+                if rows and rows[0] == expected_header: 
                     if len(rows) > 1:
                         config_row = rows[1]
                         if len(config_row) >= 12:
                             self.bg_color = config_row[5] or self.bg_color
                             self.border_color = config_row[6] or self.border_color
                             self.text_color = config_row[7] or self.text_color
-                            # index 8 is old toggle_key — ignored
-                            self.visibility_tied_to_map = config_row[9].lower() == "true"
+                            self.visibility_tied_to_map = config_row[8].lower() == "true"
                             try:
                                 self.resize(int(config_row[10]), int(config_row[11]))
                             except ValueError:
                                 pass
 
-        # Read config if present, else write default config and header
-        if file_exists and os.stat(self.csv_file).st_size > 0:
-            with open(self.csv_file, "r", encoding="utf-8", newline="") as f:
-                reader = csv.reader(f)
-                rows = list(reader)
-                if rows and rows[0][:10] == expected_header:
-                    if len(rows) > 1:
-                        config_row = rows[1]
-                        if len(config_row) >= 9:
-                            self.bg_color = config_row[5] or self.bg_color
-                            self.border_color = config_row[6] or self.border_color
-                            self.text_color = config_row[7] or self.text_color
-                            self.toggle_key = config_row[8] or self.toggle_key
-                            config_loaded = True
         if not file_exists:
             with open(self.csv_file, "w", encoding="utf-8", newline="") as f:
                 writer = csv.writer(f)
@@ -97,10 +81,10 @@ class Overlay(QtWidgets.QWidget):
                 writer.writerow([
                     "", "", "", "", "",
                     self.bg_color, self.border_color, self.text_color,
-                    "",  # keybind
                     str(self.visibility_tied_to_map),
                     str(self.width()), str(self.height())
                 ])
+
 
 
 
@@ -319,29 +303,26 @@ class Overlay(QtWidgets.QWidget):
         with open(self.csv_file, "r", encoding="utf-8", newline="") as f:
             rows = list(csv.reader(f))
 
-        # Ensure at least two rows exist
         if len(rows) < 2:
-            # Add missing header and config line
             rows = [
                 ["System Name", "Status", "Time Saved", "EDSM Link", "XYZ",
-                "BackgroundColor", "BorderColor", "TextColor", "Keybind", "MapVisibility", "Width", "Height"],
-                ["", "", "", "", "", self.bg_color, self.border_color, self.text_color, "", str(self.visibility_tied_to_map), str(self.width()), str(self.height())]
+                "BackgroundColor", "BorderColor", "TextColor", "MapVisibility", "Width", "Height"],
+                ["", "", "", "", "", self.bg_color, self.border_color, self.text_color,
+                str(self.visibility_tied_to_map), str(self.width()), str(self.height())]
             ]
+
         else:
-            # Update config row (index 1)
             if len(rows[1]) < 12:
                 rows[1] += [""] * (12 - len(rows[1]))
-            rows[1][5:12] = [
+            rows[1][5:11] = [
                 self.bg_color,
                 self.border_color,
                 self.text_color,
-                "",  # keybind placeholder
                 str(self.visibility_tied_to_map),
                 str(self.width()),
                 str(self.height())
             ]
 
-        # Write only header + config + previous saved systems
         with open(self.csv_file, "w", encoding="utf-8", newline="") as f:
             writer = csv.writer(f)
             writer.writerows(rows)
@@ -375,24 +356,13 @@ class Overlay(QtWidgets.QWidget):
         timing_text = f"<div style='text-align: center; font-size: 8pt; color: #aaa;'>{timing_info}</div>" if timing_info else ""
         self.system_label.setText(base_text + timing_text)
 
-        # Enable buttons
         web_enabled = visited and any(self.current_urls.values())
 
         self.edsm_button.setEnabled(web_enabled)
         self.find_button.setEnabled(True)
         self.save_button.setEnabled(True)
-
-        # Reset save button style (remove green if previously set)
         self.save_button.setStyleSheet("background-color: none;")
-
-        # Style the web button appropriately
-        self.edsm_button.setStyleSheet(
-            "color: white; background-color: #0a0;" if web_enabled else "color: white; background-color: #a00;"
-        )
-
-
-
-
+        self.edsm_button.setStyleSheet("color: white; background-color: #0a0;" if web_enabled else "color: white; background-color: #a00;")
 
     def show_web_menu(self):
         if not self.current_urls:
@@ -448,7 +418,6 @@ class Overlay(QtWidgets.QWidget):
         dialog.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
         layout = QtWidgets.QVBoxLayout(dialog)
 
-        # Title bar for Find Nearest Visited
         title_layout = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Find Nearest Visited")
         title.setStyleSheet("font-weight: bold; font-size: 12pt;")
@@ -520,7 +489,6 @@ class Overlay(QtWidgets.QWidget):
                 dialog.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
                 layout = QtWidgets.QVBoxLayout(dialog)
 
-                # Title bar for Nearest Visited System
                 title_layout = QtWidgets.QHBoxLayout()
                 title = QtWidgets.QLabel("Nearest Visited System")
                 close_button = QtWidgets.QPushButton("X")
@@ -540,13 +508,13 @@ class Overlay(QtWidgets.QWidget):
 
                 open_button = QtWidgets.QPushButton("Open in EDSM")
                 open_button.setStyleSheet("color: white; background-color: #0a0; border: 2px solid #ff7a00;")
-                open_button.clicked.connect(lambda: webbrowser.open_new_tab(EDSM_SYSTEM_URL.format(system_name.replace(" ", "%20"))))
+                open_button.clicked.connect(lambda: webbrowser.open_new_tab(EDSM_SYSTEM_URL.format(system_id, system_name)))
                 layout.addWidget(open_button)
 
                 dialog.exec_()
                 return
             else:
-                QtWidgets.QMessageBox.warning(self, "No Result", "No nearby systems found.")
+                QtWidgets.QMessageBox.warning(self, "No Result", "No nearby systems found and/or Sphere Systems API down. (WIP)")
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "Error", str(e))
 
@@ -560,13 +528,12 @@ class SettingsDialog(QtWidgets.QDialog):
 
         main_layout = QtWidgets.QVBoxLayout(self)
 
-        # Title bar with GH, Reset, and Close buttons
         title_bar = QtWidgets.QHBoxLayout()
         title = QtWidgets.QLabel("Settings")
         title.setStyleSheet("font-weight: bold; font-size: 12pt;")
         gh_button = QtWidgets.QPushButton("GH")
         gh_button.setFixedSize(32, 24)
-        gh_button.clicked.connect(lambda: webbrowser.open_new_tab("https://github.com/carsonbfl/CETI"))
+        gh_button.clicked.connect(lambda: webbrowser.open_new_tab(f"{GITHUB_LINK}"))
         reset_button = QtWidgets.QPushButton("R")
         reset_button.setFixedSize(24, 24)
         reset_button.setToolTip("Reset to default settings")
@@ -581,7 +548,6 @@ class SettingsDialog(QtWidgets.QDialog):
         title_bar.addWidget(close_btn)
         main_layout.addLayout(title_bar)
 
-        # Color Scheme Controls
         color_layout = QtWidgets.QHBoxLayout()
         bg_label = QtWidgets.QLabel("Background:")
         self.bg_picker = QtWidgets.QPushButton()
@@ -643,8 +609,7 @@ class SettingsDialog(QtWidgets.QDialog):
         self.height_input.setValue(parent.height())
 
         apply_size_button = QtWidgets.QPushButton("Apply Size")
-        apply_size_button.clicked.connect(lambda: parent.resize(
-            self.width_input.value(), self.height_input.value()))
+        apply_size_button.clicked.connect(lambda: parent.resize(self.width_input.value(), self.height_input.value()))
 
         size_layout.addWidget(width_label)
         size_layout.addWidget(self.width_input)

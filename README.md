@@ -1,6 +1,6 @@
 # Ch3x's Exploration Toolkit Interface (CETI)
 
-**Version:** 1.4
+**Version:** 1.5
 **Author:** CH3X
 **Purpose:** Minimalist overlay toolkit for Elite: Dangerous, focused on exploration tools including system visitation status checking, map-linked display, and data recording using EDSM, EDASTRO, and SPANSH.
 
@@ -41,7 +41,7 @@
    * **GalaxyMap** to determine when to show/hide overlay.
 4. When a system is targeted:
 
-   * CETI queries EDSM, EDASTRO, and SPANSH
+   * CETI queries EDSM, EDASTRO, and SPANSH (Spansh is link-only; not for status)
    * Displays status and enables options
 5. Use the 📂 button to save system data (manual XYZ for unvisited)
 6. Use "Find Nearby" to search visited systems around user-defined coordinates. (Mostly useful for unvisited systems, does not pull targeted system but instead prompts the user for coordinates, the name is irrelevant for this. More in future WIP)
@@ -50,7 +50,7 @@
 
 ## 📃 Output CSV Format
 
-Saved to: `CETIv1.4_saved_systems.csv`
+Saved to: `CETIv1.5_saved_systems.csv`
 
 | Column          | Description                                |
 | --------------- | ------------------------------------------ |

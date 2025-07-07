@@ -2,7 +2,7 @@ from PyQt5 import QtCore
 import os, glob, json
 
 class JournalMonitor(QtCore.QThread):
-    new_targeted_system = QtCore.pyqtSignal(str, str)  # system name, system address (as str)
+    new_targeted_system = QtCore.pyqtSignal(str, str)  
     galmap_opened = QtCore.pyqtSignal()
     galmap_closed = QtCore.pyqtSignal()
 
@@ -32,9 +32,9 @@ class JournalMonitor(QtCore.QThread):
                     self.last_position = 0
                     self.start_at_end = True
                     if latest:
-                        print(f"[JournalMonitor] Switched to new journal: {os.path.basename(latest)}")
+                        print(f"   [JournalMonitor] Switched to new journal: {os.path.basename(latest)}")
                     else:
-                        print("[JournalMonitor] No journal file found")
+                        print("   [JournalMonitor] No journal file found")
 
                 if not self.journal_file or not os.path.exists(self.journal_file):
                     self.msleep(self.poll_interval)
@@ -59,11 +59,11 @@ class JournalMonitor(QtCore.QThread):
                         if event == "FSDTarget" and "Name" in entry:
                             name = entry["Name"]
                             raw_address = entry.get("SystemAddress", 0)
-                            system_address = str(raw_address)  # force it to a string
+                            system_address = str(raw_address) 
                             self.new_targeted_system.emit(name, system_address)
 
                         elif event == "Music":
-                            track = entry.get("MusicTrack", "")
+                            track = entry.get("MusicTrack", "") # this will always be funny ♫
                             if track == "GalaxyMap" and not self.in_galmap:
                                 self.in_galmap = True
                                 self.galmap_opened.emit()
